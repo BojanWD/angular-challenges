@@ -1,5 +1,10 @@
 import { NgOptimizedImage } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  OnInit,
+} from '@angular/core';
 import {
   FakeHttpService,
   randTeacher,
@@ -7,16 +12,21 @@ import {
 import { TeacherStore } from '../../data-access/teacher.store';
 import { CardType } from '../../model/card.model';
 import { CardComponent } from '../../ui/card/card.component';
+import { ListItemComponent } from '../../ui/list-item/list-item.component';
 
 @Component({
   selector: 'app-teacher-card',
   template: `
-    <app-card
-      [list]="teachers()"
-      [type]="cardType"
-      class="bg-light-red"
-      (addItem)="addTeacher()">
-      <img ngSrc="assets/img/student.webp" width="200" height="200" />
+    <app-card [list]="teachers()" class="bg-light-red" (addItem)="addTeacher()">
+      <img ngSrc="assets/img/teacher.png" width="200" height="200" priority />
+      <ng-template #row let-item>
+        <app-list-item (delete)="deleteTeacher(item.id)">
+          <div class="flex gap-1">
+            <div>{{ item.firstName }}</div>
+            <div>{{ item.lastName }}</div>
+          </div>
+        </app-list-item>
+      </ng-template>
     </app-card>
   `,
   styles: [
@@ -26,7 +36,13 @@ import { CardComponent } from '../../ui/card/card.component';
       }
     `,
   ],
-  imports: [CardComponent, NgOptimizedImage],
+  imports: [
+    CardComponent,
+    NgOptimizedImage,
+    ListItemComponent,
+    ListItemComponent,
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TeacherCardComponent implements OnInit {
   private http = inject(FakeHttpService);
@@ -41,5 +57,9 @@ export class TeacherCardComponent implements OnInit {
 
   addTeacher() {
     this.store.addOne(randTeacher());
+  }
+
+  deleteTeacher(id: number) {
+    this.store.deleteOne(id);
   }
 }

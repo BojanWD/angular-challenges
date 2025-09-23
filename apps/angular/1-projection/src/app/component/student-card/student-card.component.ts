@@ -12,15 +12,23 @@ import {
 import { StudentStore } from '../../data-access/student.store';
 import { CardType } from '../../model/card.model';
 import { CardComponent } from '../../ui/card/card.component';
+import { ListItemComponent } from '../../ui/list-item/list-item.component';
 
 @Component({
   selector: 'app-student-card',
   template: `
     <app-card
       [list]="students()"
-      [type]="cardType"
       class="bg-light-green"
       (addItem)="addStudent()">
+      <ng-template #row let-item>
+        <app-list-item (delete)="deleteStudent(item.id)">
+          <div class="flex gap-1">
+            <div>{{ item.firstName }}</div>
+            <div>{{ item.lastName }}</div>
+          </div>
+        </app-list-item>
+      </ng-template>
       <img ngSrc="assets/img/student.webp" width="200" height="200" />
     </app-card>
   `,
@@ -31,7 +39,7 @@ import { CardComponent } from '../../ui/card/card.component';
       }
     `,
   ],
-  imports: [CardComponent, NgOptimizedImage],
+  imports: [CardComponent, NgOptimizedImage, ListItemComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StudentCardComponent implements OnInit {
@@ -47,5 +55,9 @@ export class StudentCardComponent implements OnInit {
 
   addStudent() {
     this.store.addOne(randStudent());
+  }
+
+  deleteStudent(id: number) {
+    this.store.deleteOne(id);
   }
 }

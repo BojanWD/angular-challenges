@@ -1,6 +1,14 @@
-import { Component, EventEmitter, input, Output } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ContentChild,
+  EventEmitter,
+  input,
+  Output,
+  TemplateRef,
+} from '@angular/core';
 import { CardType } from '../../model/card.model';
-import { ListItemComponent } from '../list-item/list-item.component';
 
 @Component({
   selector: 'app-card',
@@ -11,10 +19,7 @@ import { ListItemComponent } from '../list-item/list-item.component';
 
       <section>
         @for (item of list(); track item) {
-          <app-list-item
-            [name]="item.firstName"
-            [id]="item.id"
-            [type]="type()"></app-list-item>
+          <ng-container *ngTemplateOutlet="row; context: { $implicit: item }" />
         }
       </section>
 
@@ -25,16 +30,16 @@ import { ListItemComponent } from '../list-item/list-item.component';
       </button>
     </ng-container>
   `,
-  imports: [ListItemComponent],
+  imports: [NgTemplateOutlet],
   host: {
     class: 'flex w-fit flex-col gap-3 rounded-md border-2 border-black p-4',
   },
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CardComponent {
+export class CardComponent<T extends { id: number }> {
   @Output() addItem: EventEmitter<void> = new EventEmitter();
-
-  readonly list = input<any[] | null>(null);
-  readonly type = input.required<CardType>();
+  @ContentChild('row') row: TemplateRef<any> | undefined;
+  readonly list = input<T[] | null>(null);
 
   CardType = CardType;
 
