@@ -11,6 +11,7 @@ import {
 } from '../../data-access/fake-http.service';
 import { TeacherStore } from '../../data-access/teacher.store';
 import { CardType } from '../../model/card.model';
+import { CardRowDirective } from '../../ui/card-row/card-row-directive';
 import { CardComponent } from '../../ui/card/card.component';
 import { ListItemComponent } from '../../ui/list-item/list-item.component';
 
@@ -19,7 +20,7 @@ import { ListItemComponent } from '../../ui/list-item/list-item.component';
   template: `
     <app-card [list]="teachers()" class="bg-light-red" (addItem)="addTeacher()">
       <img ngSrc="assets/img/teacher.png" width="200" height="200" priority />
-      <ng-template #row let-item>
+      <ng-template [cardRow]="teachers()" let-item>
         <app-list-item (delete)="deleteTeacher(item.id)">
           <div class="flex gap-1">
             <div>{{ item.firstName }}</div>
@@ -41,6 +42,7 @@ import { ListItemComponent } from '../../ui/list-item/list-item.component';
     NgOptimizedImage,
     ListItemComponent,
     ListItemComponent,
+    CardRowDirective,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

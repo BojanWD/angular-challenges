@@ -2,13 +2,14 @@ import { NgTemplateOutlet } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
-  ContentChild,
+  contentChild,
   EventEmitter,
   input,
   Output,
   TemplateRef,
 } from '@angular/core';
 import { CardType } from '../../model/card.model';
+import { CardRowDirective } from '../card-row/card-row-directive';
 
 @Component({
   selector: 'app-card',
@@ -19,7 +20,8 @@ import { CardType } from '../../model/card.model';
 
       <section>
         @for (item of list(); track item) {
-          <ng-container *ngTemplateOutlet="row; context: { $implicit: item }" />
+          <ng-container
+            *ngTemplateOutlet="rowTemplate(); context: { $implicit: item }" />
         }
       </section>
 
@@ -38,7 +40,7 @@ import { CardType } from '../../model/card.model';
 })
 export class CardComponent<T extends { id: number }> {
   @Output() addItem: EventEmitter<void> = new EventEmitter();
-  @ContentChild('row') row: TemplateRef<any> | undefined;
+  rowTemplate = contentChild.required(CardRowDirective, { read: TemplateRef });
   readonly list = input<T[] | null>(null);
 
   CardType = CardType;

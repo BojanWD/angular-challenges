@@ -11,6 +11,7 @@ import {
 } from '../../data-access/fake-http.service';
 import { StudentStore } from '../../data-access/student.store';
 import { CardType } from '../../model/card.model';
+import { CardRowDirective } from '../../ui/card-row/card-row-directive';
 import { CardComponent } from '../../ui/card/card.component';
 import { ListItemComponent } from '../../ui/list-item/list-item.component';
 
@@ -21,7 +22,7 @@ import { ListItemComponent } from '../../ui/list-item/list-item.component';
       [list]="students()"
       class="bg-light-green"
       (addItem)="addStudent()">
-      <ng-template #row let-item>
+      <ng-template [cardRow]="students()" let-item>
         <app-list-item (delete)="deleteStudent(item.id)">
           <div class="flex gap-1">
             <div>{{ item.firstName }}</div>
@@ -39,7 +40,12 @@ import { ListItemComponent } from '../../ui/list-item/list-item.component';
       }
     `,
   ],
-  imports: [CardComponent, NgOptimizedImage, ListItemComponent],
+  imports: [
+    CardComponent,
+    NgOptimizedImage,
+    ListItemComponent,
+    CardRowDirective,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StudentCardComponent implements OnInit {
