@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { PersonUtils } from './person.utils';
+import { UtilityWrapperPipe } from './pipe/utility-wrapper';
 
 @Component({
   selector: 'app-root',
@@ -12,11 +13,15 @@ import { PersonUtils } from './person.utils';
         let index = $index;
         let isFirst = $first
       ) {
-        {{ showName(person.name, index) }}
-        {{ isAllowed(person.age, isFirst, activity.minimumAge) }}
+        {{ 'showName' | utilityWrapper: person.name : index }}
+        {{
+          'isAllowed'
+            | utilityWrapper: person.age : isFirst : activity.minimumAge
+        }}
       }
     }
   `,
+  imports: [UtilityWrapperPipe],
 })
 export class AppComponent {
   persons = [
