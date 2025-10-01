@@ -7,8 +7,10 @@ import {
   Output,
   signal,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
-  finalize,
+  delay,
+  filter,
   fromEvent,
   interval,
   map,
@@ -16,6 +18,7 @@ import {
   switchMap,
   takeUntil,
   takeWhile,
+  tap,
 } from 'rxjs';
 
 @Directive({
@@ -34,7 +37,9 @@ export class DelayedClickDirective {
     const mousedown$ = fromEvent<MouseEvent>(el, 'mousedown');
     const mouseup$ = fromEvent<MouseEvent>(el, 'mouseup');
     const leave$ = fromEvent<MouseEvent>(el, 'mouseleave');
-    const cancel$ = merge(mouseup$, leave$);
+    const cancel$ = merge(mouseup$, leave$).pipe(
+      tap(() => this.changeProgress(0)),
+    );
 
     mousedown$
       .pipe(
@@ -45,18 +50,20 @@ export class DelayedClickDirective {
             map((elapsed) => Math.min((elapsed / this.holdTime) * 100, 100)),
             takeWhile((p) => p < 100, true),
             takeUntil(cancel$),
-            finalize(() => {
-              if (this.progress() >= 100) {
-                this.clickFinalized.emit(); // fire only on completion
-              }
-              this.changeProgress(0);
+            tap((p) => {
+              this.changeProgress(p);
             }),
+            filter((p) => {
+              return p >= 100;
+            }),
+            tap(() => this.clickFinalized.emit()),
+            delay(300),
+            tap(() => this.changeProgress(0)),
+            takeUntilDestroyed(),
           );
         }),
       )
-      .subscribe((p) => {
-        this.changeProgress(p);
-      });
+      .subscribe();
   }
 
   private changeProgress(v: number) {
