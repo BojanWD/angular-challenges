@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { merge, Observable, of } from 'rxjs';
+import { forkJoin, Observable, of, switchMap } from 'rxjs';
 import { LocalDBService, TopicType } from './localDB.service';
 
 @Injectable({ providedIn: 'root' })
@@ -11,9 +11,15 @@ export class AppService {
   deleteOldTopics(type: TopicType): Observable<boolean> {
     const infoByType = this.dbService.searchByType(type);
     return infoByType.length > 0
-      ? infoByType
-          .map((t) => this.dbService.deleteOneTopic(t.id))
-          .reduce((acc, curr) => merge(acc, curr), of(true))
+      ? forkJoin(
+          infoByType.map((t) => this.dbService.deleteOneTopic(t.id)),
+        ).pipe(
+          switchMap((value) => {
+            console.log(value);
+            const allTrue = value.every(Boolean);
+            return of(allTrue);
+          }),
+        )
       : of(true);
   }
 }

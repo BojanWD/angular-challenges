@@ -1,6 +1,5 @@
 /* eslint-disable @angular-eslint/component-selector */
 import { Component, inject, input, signal } from '@angular/core';
-import { take } from 'rxjs';
 import { AppService } from './app.service';
 import { TopicType } from './localDB.service';
 
@@ -19,16 +18,13 @@ export class ButtonDeleteComponent {
   private service = inject(AppService);
 
   deleteTopic() {
-    this.service
-      .deleteOldTopics(this.topic())
-      .pipe(take(1))
-      .subscribe((result) =>
-        this.message.set(
-          result
-            ? `All ${this.topic()} have been deleted`
-            : `Error: deletion of some ${this.topic()} failed`,
-        ),
+    this.service.deleteOldTopics(this.topic()).subscribe((result) => {
+      this.message.set(
+        result
+          ? `All ${this.topic()} have been deleted`
+          : `Error: deletion of some ${this.topic()} failed`,
       );
+    });
   }
 }
 
