@@ -1,9 +1,6 @@
 import { Component, computed, signal } from '@angular/core';
 
-enum Difficulty {
-  EASY = 'easy',
-  NORMAL = 'normal',
-}
+type Difficulty = 'easy' | 'normal';
 
 enum Direction {
   LEFT = 'left',
@@ -16,10 +13,10 @@ enum Direction {
   template: `
     <section>
       <div>
-        <button mat-stroked-button (click)="difficulty.set(Difficulty.EASY)">
+        <button mat-stroked-button (click)="difficulty.set('easy')">
           Easy
         </button>
-        <button mat-stroked-button (click)="difficulty.set(Difficulty.NORMAL)">
+        <button mat-stroked-button (click)="difficulty.set('normal')">
           Normal
         </button>
       </div>
@@ -53,18 +50,17 @@ enum Direction {
   `,
 })
 export class AppComponent {
-  readonly Difficulty = Difficulty;
-  readonly difficulty = signal<Difficulty>(Difficulty.EASY);
+  readonly difficulty = signal<Difficulty>('easy');
 
   readonly Direction = Direction;
   readonly direction = signal<Direction | undefined>(undefined);
 
   readonly difficultyLabel = computed<string>(() => {
     switch (this.difficulty()) {
-      case Difficulty.EASY:
-        return Difficulty.EASY;
-      case Difficulty.NORMAL:
-        return Difficulty.NORMAL;
+      case 'easy':
+        return 'easy';
+      case 'normal':
+        return 'normal';
     }
   });
 
