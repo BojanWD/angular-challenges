@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { createVehicle } from './vehicle.utils';
+import createVehicle from './vehicle.utils';
 
 @Component({
   selector: 'app-root',
@@ -8,7 +8,7 @@ import { createVehicle } from './vehicle.utils';
 export class AppComponent {
   car = createVehicle('car', 'diesel');
   moto = createVehicle('moto', 'diesel');
-  bus = createVehicle('bus', undefined, 20);
-  boat = createVehicle('boat', undefined, 300, true);
+  bus = createVehicle('bus', undefined, 20, true);
+  boat = createVehicle('boat', undefined, 300);
   bicycle = createVehicle('bicycle');
 }
