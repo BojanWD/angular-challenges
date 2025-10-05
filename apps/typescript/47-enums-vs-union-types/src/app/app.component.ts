@@ -1,11 +1,17 @@
 import { Component, computed, signal } from '@angular/core';
 
 type Difficulty = 'easy' | 'normal';
+const difficulty = {
+  easy: 'easy',
+  normal: 'normal',
+};
 
-enum Direction {
-  LEFT = 'left',
-  RIGHT = 'right',
-}
+type Direction = 'left' | 'right';
+type DirectionMap = { [k in Direction]: string };
+const directions: DirectionMap = {
+  left: 'left',
+  right: 'right',
+};
 
 @Component({
   imports: [],
@@ -25,10 +31,8 @@ enum Direction {
 
     <section>
       <div>
-        <button mat-stroked-button (click)="direction.set(Direction.LEFT)">
-          Left
-        </button>
-        <button mat-stroked-button (click)="direction.set(Direction.RIGHT)">
+        <button mat-stroked-button (click)="direction.set('left')">Left</button>
+        <button mat-stroked-button (click)="direction.set('right')">
           Right
         </button>
       </div>
@@ -52,27 +56,15 @@ enum Direction {
 export class AppComponent {
   readonly difficulty = signal<Difficulty>('easy');
 
-  readonly Direction = Direction;
   readonly direction = signal<Direction | undefined>(undefined);
 
-  readonly difficultyLabel = computed<string>(() => {
-    switch (this.difficulty()) {
-      case 'easy':
-        return 'easy';
-      case 'normal':
-        return 'normal';
-    }
-  });
+  readonly difficultyLabel = computed<string>(
+    () => difficulty[this.difficulty()],
+  );
 
-  readonly directionLabel = computed<string>(() => {
-    const prefix = 'You chose to go';
-    switch (this.direction()) {
-      case Direction.LEFT:
-        return `${prefix} ${Direction.LEFT}`;
-      case Direction.RIGHT:
-        return `${prefix} ${Direction.RIGHT}`;
-      default:
-        return 'Choose a direction!';
-    }
-  });
+  readonly directionLabel = computed<string>(() =>
+    this.direction()
+      ? `You chose to go ${directions[this.direction()!]}`
+      : 'Choose a direction',
+  );
 }
