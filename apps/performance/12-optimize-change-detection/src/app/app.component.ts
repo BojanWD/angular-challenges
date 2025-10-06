@@ -1,4 +1,9 @@
-import { Component, HostListener, signal } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  HostListener,
+  signal,
+} from '@angular/core';
 
 @Component({
   selector: 'app-root',
@@ -34,10 +39,18 @@ export class AppComponent {
 
   public displayButton = signal(false);
 
+  constructor(private cdr: ChangeDetectorRef) {
+    this.cdr.detach();
+  }
+
   @HostListener('window:scroll', ['$event'])
   onScroll() {
     const pos = window.scrollY;
-    this.displayButton.set(pos > 50);
+    const shouldDisplay = pos > 50;
+    if (shouldDisplay !== this.displayButton()) {
+      this.displayButton.set(shouldDisplay);
+      this.cdr.detectChanges();
+    }
   }
 
   goToTop() {
