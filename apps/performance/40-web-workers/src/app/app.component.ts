@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { HeavyCalculationService } from './heavy-calculation.service';
 import { UnknownPersonComponent } from './unknown-person/unknown-person.component';
 
@@ -8,11 +8,13 @@ import { UnknownPersonComponent } from './unknown-person/unknown-person.componen
   selector: 'app-root',
   template: `
     <unknown-person [step]="loadingPercentage()" class="relative grow" />
-    <button
-      class="my-3 w-fit self-center rounded-md border border-white px-4 py-2 text-2xl text-white"
-      (click)="discover()">
-      Discover
-    </button>
+    @if (loadingPercentage() === 0) {
+      <button
+        class="my-3 w-fit self-center rounded-md border border-white px-4 py-2 text-2xl text-white"
+        (click)="discover()">
+        Discover
+      </button>
+    }
     <div class="p-1 text-white">Progress: {{ loadingPercentage() }}%</div>
   `,
   host: {
@@ -21,10 +23,39 @@ import { UnknownPersonComponent } from './unknown-person/unknown-person.componen
 })
 export class AppComponent {
   private heavyCalculationService = inject(HeavyCalculationService);
+  private worker: Worker | null = null;
 
-  readonly loadingPercentage = this.heavyCalculationService.loadingPercentage;
+  private readonly webWorkerLoadingPercentage = signal(0);
+
+  readonly loadingPercentage = computed(
+    () =>
+      this.heavyCalculationService.loadingPercentage() ||
+      this.webWorkerLoadingPercentage(),
+  );
 
   discover() {
-    this.heavyCalculationService.startLoading();
+    if (!this.worker) {
+      this.heavyCalculationService.startLoading();
+    } else {
+      this.worker.postMessage('startHeavyCalculation');
+    }
+  }
+
+  constructor() {
+    this.initWebWorker();
+  }
+
+  private initWebWorker() {
+    if (typeof Worker === 'undefined') {
+      return;
+    }
+
+    this.worker = new Worker(
+      new URL('./complex-computation.worker', import.meta.url),
+    );
+
+    this.worker.onmessage = ({ data }) => {
+      this.webWorkerLoadingPercentage.set(data);
+    };
   }
 }

@@ -5,16 +5,26 @@ addEventListener('message', ({ data }) => {
   postMessage(response);
 });
 
-if (typeof Worker !== 'undefined') {
-  // Create a new
-  const worker = new Worker(
-    new URL('./complex-computation.worker', import.meta.url),
-  );
-  worker.onmessage = ({ data }) => {
-    console.log(`page got message ${data}`);
-  };
-  worker.postMessage('hello');
-} else {
-  // Web Workers are not supported in this environment.
-  // You should add a fallback so that your program still executes correctly.
+addEventListener('message', () => {
+  let loadingLength = 0;
+
+  for (let num = 2; num <= 10000000; num++) {
+    let randomFlag = true;
+    for (let i = 2; i <= Math.sqrt(num); i++) {
+      if (num % i === 0) {
+        randomFlag = false;
+        break;
+      }
+    }
+    if (randomFlag) {
+      loadingLength = loadingLength + 1;
+      postMessage(getPercentage(loadingLength));
+    }
+  }
+});
+
+function getPercentage(loadingLength: number) {
+  const finalLength = 664579;
+
+  return Math.round((loadingLength * 100) / finalLength);
 }
